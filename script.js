@@ -59,7 +59,7 @@ function checkWin() {
 
 async function doChainReaction(elemListQuery, curPlayer) {
 
-  elems = $$(elemListQuery);
+  let elems = [...$$(elemListQuery)];
   
   if ( elems.length == 0 ) return false;
 
@@ -68,9 +68,10 @@ async function doChainReaction(elemListQuery, curPlayer) {
     promiseResolve = r;
   });
 
-
   elems.forEach(elem => {
     let placeN = elem.className.match(/box-n-(\d+)/)[1] / 1;
+
+    console.log(gridX)
 
     // the four places to target
     let allPlaces = [placeN - 1, placeN + 1, placeN - gridX, placeN + gridX].map((x,i) => {
@@ -80,42 +81,46 @@ async function doChainReaction(elemListQuery, curPlayer) {
       }
 
       return null;
-
     });
 
-    allPlaces.forEach(function(n,i) {
+    allPlaces.forEach(async function(n,i) {
+
+      let promiseToResolve;
+      let promiseToWait = new Promise(function(r) {
+        promiseToResolve = r;
+      })
+
       if ( n == null ) return;
       let placeElem = $(`.box-n-${n}`);
       let dotN = placeElem.className.match(/dot(\d)/)
       dotN = dotN ? dotN[1] / 1 : 0;
-      placeElem.className = `box box-n-${n}`
-      placeElem.classList.add(`dot${dotN+1}`);
-      placeElem.classList.add(`player-${curPlayer}`)
-
-
-      /* animation */
-      placeElem.classList.add(
-        `move-${['left', 'right', 'up', 'down'][i]}`
-      )
-      placeElem.classList.add('appearMove')
+      dotN = dotN > 4 ? dotN % 4 + 1: dotN;
+      if ( placeElem.classList.contains('chainReacted') ) {
+        dotN = 0;
+      }
+      placeElem.className = `appearMove box box-n-${n} dot${dotN+1} player-${curPlayer} move-${['left', 'right', 'up', 'down'][i]}`
       placeElem.style.setProperty('--color', `var(${TURNS[curPlayer]})`);
-      setTimeout(() => {
-        placeElem.classList.remove('appearMove')
-      }, 500)
 
+      setTimeout(function() {
+        placeElem.classList.remove('appearMove')
+        promiseToResolve();
+      }, 500);
+
+      await promiseToWait;
     });
 
     elem.style.backgroundColor = "var(--bg)";
-
+    elem.classList.add('chainReacted')
     /* set the original box empty after 100ms */
     setTimeout(() => {
       elem.className = `box box-n-${placeN}`;
+      elem.style.backgroundColor = "";
     }, 100)
 
     /* do the next chain reaction a bit later */
     setTimeout(() => {
       promiseResolve(doChainReaction('.box.dot4', curPlayer));
-    }, 500)
+    }, 400)
   })
 
   return promise;
@@ -142,9 +147,9 @@ function gameStart() {
       if ( elem.className.search(/dot\d/) == -1 ) {
         if ( playerFirstMove[`player-${curPlayer}`] !== undefined ) return;
         elem.style.setProperty('--color', `var(${TURNS[curPlayer]})`)
-        elem.classList.add(`dot1`)
+        elem.classList.add(`dot3`)
+        // elem.dataset.dot = 3;
         playerFirstMove[`player-${curPlayer}`] = true;
-  
         elem.classList.add(`player-${curPlayer}`);
         curPlayer = (curPlayer+1) % playerCount;
   
@@ -159,6 +164,7 @@ function gameStart() {
         let dotN = elem.className.match(/dot(\d)/)[1] / 1
         elem.classList.remove(`dot${dotN}`);
         elem.classList.add(`dot${dotN+1}`);
+        // elem.dataset.dot = dotN + 1;
   
         // do the chain reaction
         if ( dotN + 1 == 4 ) {
