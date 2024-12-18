@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+  <script src="choose.js" defer></script>
+</head>
+<body>
+  <div class="chooseScreen">
+    <h1>Choose Grid Size</h1>
+    <div class="chooseGrid">
+      <div style="--gridX: 10; --gridY: 8" class="gridBox">
+        10 x 8
+      </div>
+      <div style="--gridX: 10; --gridY: 10" class="gridBox">
+        10 x 10
+      </div>
+      <div style="--gridX: 15; --gridY: 10" class="gridBox">
+        15 x 10        
+      </div>
+      <div style="--gridX: 20; --gridY: 8" class="gridBox">
+        20 x 8
+      </div>
+      <div style="--gridX: 20; --gridY: 10" class="gridBox selected">
+        20 x 10
+      </div>
+      <div style="--gridX: 22; --gridY: 10" class="gridBox">
+        22 x 10
+      </div>
+    </div>
+    <h1>No of players</h1>
+    <div class="choosePlayer">
+      <div style="--player: 2;" class="plBox selected">
+        2
+      </div>
+      <div style="--player: 3;" class="plBox">
+        3
+      </div>
+      <div style="--player: 4;" class="plBox">
+        4
+      </div>
+      <div style="--player: 5;" class="plBox">
+        5
+      </div>
+      <div style="--player: 6;" class="plBox">
+        6
+      </div>
+    </div>
+    <div class="button" id="playButton">Play</div>
+  </div>
+  <div class="grid mainGame hidden"></div>
+  <div class="winScreen hidden"></div>
+</body>
+</html>
